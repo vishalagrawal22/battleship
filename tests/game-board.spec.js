@@ -61,4 +61,30 @@ describe('gameboard object testing', () => {
     }
     expect(gameBoard.isGameOver()).toBe(true);
   });
+
+  test('empty board is game over', () => {
+    expect(gameBoard.isGameOver()).toBe(true);
+  });
+
+  test('can end game multi ships', () => {
+    expect(gameBoard.addShip(verticalShip)).toBe(true);
+    expect(gameBoard.addShip(horizontalShip)).toBe(true);
+
+    expect(gameBoard.isGameOver()).toBe(false);
+
+    for (let i = 0; i < verticalShip.length; i++) {
+      expect(
+        gameBoard.attack(verticalShip.start_x, verticalShip.start_y + i)
+      ).toBe(true);
+    }
+
+    expect(gameBoard.isGameOver()).toBe(false);
+
+    for (let i = 0; i < horizontalShip.length; i++) {
+      expect(
+        gameBoard.attack(horizontalShip.start_x + i, horizontalShip.start_y)
+      ).toBe(true);
+    }
+    expect(gameBoard.isGameOver()).toBe(true);
+  });
 });
