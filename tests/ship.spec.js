@@ -1,4 +1,3 @@
-import { TestWatcher } from 'jest';
 import shipFactory from '../src/ship-factory.js';
 
 describe('ship object testing', () => {
