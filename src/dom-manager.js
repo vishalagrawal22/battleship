@@ -1,13 +1,25 @@
 import shipFactory from './ship-factory';
 
-function createGrid(length) {
+function createGrid(num_of_rows, num_of_columns) {
   const grid = document.createElement('article');
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i < num_of_rows; i++) {
     const row = document.createElement('div');
     row.className = 'row';
-    for (let j = 0; j < length; j++) {
+    for (let j = 0; j < num_of_columns; j++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
+      if (i == 0) {
+        cell.style['border-top'] = '2px solid black';
+      } else if (i === num_of_rows - 1) {
+        cell.style['border-bottom'] = '2px solid black';
+      }
+
+      if (j == 0) {
+        cell.style['border-left'] = '2px solid black';
+      } else if (j === num_of_columns - 1) {
+        cell.style['border-right'] = '2px solid black';
+      }
+
       const shipContainer = document.createElement('div');
       cell.appendChild(shipContainer);
       row.appendChild(cell);
@@ -56,7 +68,7 @@ function massAddShipsToGrid(grid, ships) {
   });
 }
 
-const grid = createGrid(10);
+const grid = createGrid(10, 10);
 const verticalShip = shipFactory(2, 3, 5, 1);
 const horizontalShip = shipFactory(5, 5, 4, 0);
 massAddShipsToGrid(grid, [verticalShip, horizontalShip]);
