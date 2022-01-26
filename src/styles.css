@@ -15,6 +15,10 @@ html {
   box-sizing: inherit;
 }
 
+body {
+  padding: 16px;
+}
+
 .cell {
   width: 30px;
   height: 30px;
@@ -49,4 +53,8 @@ html {
 .round-right {
   border-top-right-radius: 50%;
   border-bottom-right-radius: 50%;
+}
+
+.row {
+  display: flex;
 }
