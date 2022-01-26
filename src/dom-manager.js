@@ -8,6 +8,7 @@ function createGrid(num_of_rows, num_of_columns) {
     for (let j = 0; j < num_of_columns; j++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
+
       if (i == 0) {
         cell.style['border-top'] = '2px solid black';
       } else if (i === num_of_rows - 1) {
@@ -21,6 +22,10 @@ function createGrid(num_of_rows, num_of_columns) {
       }
 
       const shipContainer = document.createElement('div');
+      cell.addEventListener('click', () => {
+        markCellAsDestroyed(grid, j + 1, i + 1);
+      });
+
       cell.appendChild(shipContainer);
       row.appendChild(cell);
     }
@@ -33,6 +38,11 @@ function getCell(grid, x, y) {
   const row = grid.children.item(y - 1);
   const cell = row.children.item(x - 1);
   return cell.firstChild;
+}
+
+function markCellAsDestroyed(grid, x, y) {
+  const cell = getCell(grid, x, y);
+  cell.classList.add('destroyed');
 }
 
 function addShipToGrid(grid, ship) {
