@@ -2,6 +2,8 @@ import {
   ADD_GAME_BOARDS_TO_DISPLAY,
   HANDLE_ATTACK,
   ADD_WINNER_TO_DISPLAY,
+  HANDLE_ADD_SHIP,
+  INIT_DOM,
 } from './topic';
 import { publish, subscribe } from './topic-manager';
 
@@ -86,12 +88,48 @@ function markDestroyedCells(grid, gameboard) {
   }
 }
 
+function setupDropZone(grid, gameboard) {
+  for (let y = 1; y <= gameboard.num_of_rows; y++) {
+    for (let x = 1; x <= gameboard.num_of_columns; x++) {
+      const cell = getCell(grid, x, y);
+      cell.addEventListener('dragover', (event) => {
+        event.preventDefault();
+      });
+
+      cell.addEventListener('drop', (event) => {
+        event.preventDefault();
+        const id = event.dataTransfer.getData('ship-id');
+        const offset = event.dataTransfer.getData('ship-offset');
+        const ship = document.querySelector(`#${id}`);
+        const length = parseInt(ship.getAttribute('data-length'));
+        const isVertical = ship.classList.contains('vertical');
+        let start_x = x;
+        let start_y = y;
+        if (isVertical) {
+          start_y -= offset;
+        } else {
+          start_x -= offset;
+        }
+
+        publish(HANDLE_ADD_SHIP, {
+          start_x,
+          start_y,
+          length,
+          isVertical,
+          id,
+        });
+      });
+    }
+  }
+}
+
 function getCurrentPlayerGrid(gameboard) {
   const grid = createGrid(
     gameboard.num_of_rows,
     gameboard.num_of_columns,
     'current'
   );
+  setupDropZone(grid, gameboard);
   markDestroyedCells(grid, gameboard);
   massAddShipsToGrid(grid, gameboard.ships);
   return grid;
@@ -158,3 +196,54 @@ function addWinnerToDisplay(
   disableAttackListeners(opponentGrid);
 }
 subscribe(ADD_WINNER_TO_DISPLAY, addWinnerToDisplay);
+
+function setupDraggableShips() {
+  const shipLengths = [5, 4, 3, 3, 2];
+  const ships = Array.from(document.querySelector('.drag-ships').children);
+  ships.forEach((ship, index) => {
+    ship.setAttribute('draggable', 'true');
+    ship.setAttribute('data-length', shipLengths[index]);
+
+    ship.classList.add('ship');
+    for (let i = 0; i < shipLengths[index]; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('ship-part');
+      const shipContainer = document.createElement('div');
+      if (i === 0) {
+        shipContainer.classList.add('round-left');
+      } else if (i === shipLengths[index] - 1) {
+        shipContainer.classList.add('round-right');
+      } else {
+        shipContainer.classList.add('mid');
+      }
+      cell.appendChild(shipContainer);
+      ship.appendChild(cell);
+    }
+
+    ship.addEventListener('dragstart', (event) => {
+      const partRef = event.explicitOriginalTarget;
+      const isRef = (part) => part.firstChild === partRef;
+      const offset = Array.from(ship.children).findIndex(isRef);
+      event.dataTransfer.setData('ship-id', ship.id);
+      event.dataTransfer.setData('ship-offset', offset);
+    });
+
+    ship.addEventListener('dblclick', (event) => {
+      const start = ship.firstChild.firstChild;
+      const end = ship.lastChild.firstChild;
+      if (ship.classList.contains('vertical')) {
+        start.classList.replace('round-top', 'round-left');
+        end.classList.replace('round-bottom', 'round-right');
+      } else {
+        start.classList.replace('round-left', 'round-top');
+        end.classList.replace('round-right', 'round-bottom');
+      }
+      ship.classList.toggle('vertical');
+    });
+  });
+}
+
+function initializeDOM(topic, {}) {
+  setupDraggableShips();
+}
+subscribe(INIT_DOM, initializeDOM);

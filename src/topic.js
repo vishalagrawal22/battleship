@@ -8,4 +8,16 @@ const HANDLE_ATTACK = 'Controller: handle attack on gameboard';
 const ADD_WINNER_TO_DISPLAY = 'DOM: add winner to display';
 // data: { winner, currentPlayerGameBoard, opponentGameBoard }
 
-export { ADD_GAME_BOARDS_TO_DISPLAY, HANDLE_ATTACK, ADD_WINNER_TO_DISPLAY };
+const HANDLE_ADD_SHIP = 'Controller: handle add ship';
+// data: { start_x, start_y, length, isVertical, id }
+
+const INIT_DOM = 'DOM: Initialize';
+// data: { }
+
+export {
+  ADD_GAME_BOARDS_TO_DISPLAY,
+  HANDLE_ATTACK,
+  ADD_WINNER_TO_DISPLAY,
+  HANDLE_ADD_SHIP,
+  INIT_DOM,
+};

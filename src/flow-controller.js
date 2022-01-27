@@ -6,6 +6,7 @@ import {
   ADD_GAME_BOARDS_TO_DISPLAY,
   HANDLE_ATTACK,
   ADD_WINNER_TO_DISPLAY,
+  INIT_DOM,
 } from './topic';
 
 function gameFactory(mode, players) {
@@ -124,3 +125,5 @@ computerShips.forEach((ship) => {
 
 let game = gameFactory('VS Computer', players);
 game.init();
+
+publish(INIT_DOM, {});
