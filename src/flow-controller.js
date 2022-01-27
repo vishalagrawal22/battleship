@@ -1,7 +1,7 @@
 import { publish, subscribe } from './topic-manager';
 import gameBoardFactory from './game-board';
 import shipFactory from './ship-factory';
-import { ADD_GAME_BOARDS_TO_DISPLAY } from './topic';
+import { ADD_GAME_BOARDS_TO_DISPLAY, HANDLE_ATTACK } from './topic';
 
 const currentPlayerGameBoard = gameBoardFactory(10, 10);
 const currentPlayerShips = [
@@ -15,8 +15,6 @@ const currentPlayerShips = [
 currentPlayerShips.forEach((ship) => {
   currentPlayerGameBoard.addShip(ship);
 });
-currentPlayerGameBoard.attack(1, 1);
-currentPlayerGameBoard.attack(3, 5);
 
 const opponentGameBoard = gameBoardFactory(10, 10);
 const opponentShips = [
@@ -30,10 +28,17 @@ const opponentShips = [
 opponentShips.forEach((ship) => {
   opponentGameBoard.addShip(ship);
 });
-opponentGameBoard.attack(5, 5);
-opponentGameBoard.attack(2, 8);
 
 publish(ADD_GAME_BOARDS_TO_DISPLAY, {
   currentPlayerGameBoard,
   opponentGameBoard,
 });
+
+function handleAttack(topic, { x, y }) {
+  opponentGameBoard.attack(x, y);
+  publish(ADD_GAME_BOARDS_TO_DISPLAY, {
+    currentPlayerGameBoard,
+    opponentGameBoard,
+  });
+}
+subscribe(HANDLE_ATTACK, handleAttack);

@@ -1,5 +1,5 @@
-import { ADD_GAME_BOARDS_TO_DISPLAY } from './topic';
-import { subscribe } from './topic-manager';
+import { ADD_GAME_BOARDS_TO_DISPLAY, HANDLE_ATTACK } from './topic';
+import { publish, subscribe } from './topic-manager';
 
 function createGrid(num_of_rows, num_of_columns) {
   const grid = document.createElement('article');
@@ -88,9 +88,40 @@ function getCurrentPlayerGrid(gameboard) {
   return grid;
 }
 
+function markSuccessfullyDestroyedShipParts(grid, gameboard) {
+  for (let y = 1; y <= gameboard.num_of_rows; y++) {
+    for (let x = 1; x <= gameboard.num_of_columns; x++) {
+      if (!gameboard.canAttack(x, y) && !gameboard.isEmpty(x, y)) {
+        const cell = getCell(grid, x, y);
+        cell.classList.add('success');
+      }
+    }
+  }
+}
+
+function disableAttackListeners(grid) {
+  grid.style['pointer-events'] = 'none';
+}
+
+function setupAttackListener(grid, gameboard) {
+  for (let y = 1; y <= gameboard.num_of_rows; y++) {
+    for (let x = 1; x <= gameboard.num_of_columns; x++) {
+      if (gameboard.canAttack(x, y)) {
+        const cell = getCell(grid, x, y);
+        cell.addEventListener('click', () => {
+          disableAttackListeners(grid);
+          publish(HANDLE_ATTACK, { x, y });
+        });
+      }
+    }
+  }
+}
+
 function getOpponentGrid(gameboard) {
   const grid = createGrid(gameboard.num_of_rows, gameboard.num_of_columns);
+  markSuccessfullyDestroyedShipParts(grid, gameboard);
   markDestroyedCells(grid, gameboard);
+  setupAttackListener(grid, gameboard);
   return grid;
 }
 
