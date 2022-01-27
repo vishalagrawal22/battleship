@@ -1,4 +1,5 @@
-import shipFactory from './ship-factory';
+import { ADD_GAME_BOARDS_TO_DISPLAY } from './topic';
+import { subscribe } from './topic-manager';
 
 function createGrid(num_of_rows, num_of_columns) {
   const grid = document.createElement('article');
@@ -22,10 +23,6 @@ function createGrid(num_of_rows, num_of_columns) {
       }
 
       const shipContainer = document.createElement('div');
-      cell.addEventListener('click', () => {
-        markCellAsDestroyed(grid, j + 1, i + 1);
-      });
-
       cell.appendChild(shipContainer);
       row.appendChild(cell);
     }
@@ -38,11 +35,6 @@ function getCell(grid, x, y) {
   const row = grid.children.item(y - 1);
   const cell = row.children.item(x - 1);
   return cell.firstChild;
-}
-
-function markCellAsDestroyed(grid, x, y) {
-  const cell = getCell(grid, x, y);
-  cell.classList.add('destroyed');
 }
 
 function addShipToGrid(grid, ship) {
@@ -78,10 +70,35 @@ function massAddShipsToGrid(grid, ships) {
   });
 }
 
-const grid = createGrid(10, 10);
-const verticalShip = shipFactory(2, 3, 5, 1);
-const horizontalShip = shipFactory(5, 5, 4, 0);
-massAddShipsToGrid(grid, [verticalShip, horizontalShip]);
+function markDestroyedCells(grid, gameboard) {
+  for (let y = 1; y <= gameboard.num_of_rows; y++) {
+    for (let x = 1; x <= gameboard.num_of_columns; x++) {
+      if (!gameboard.canAttack(x, y)) {
+        const cell = getCell(grid, x, y);
+        cell.classList.add('destroyed');
+      }
+    }
+  }
+}
 
-const main = document.querySelector('main');
-main.appendChild(grid);
+function getCurrentPlayerGrid(gameboard) {
+  const grid = createGrid(gameboard.num_of_rows, gameboard.num_of_columns);
+  markDestroyedCells(grid, gameboard);
+  massAddShipsToGrid(grid, gameboard.ships);
+  return grid;
+}
+
+function getOpponentGrid(gameboard) {
+  const grid = createGrid(gameboard.num_of_rows, gameboard.num_of_columns);
+  markDestroyedCells(grid, gameboard);
+  return grid;
+}
+
+function setupDisplay(topic, { currentPlayerGameBoard, opponentGameBoard }) {
+  const main = document.querySelector('main');
+  main.innerHTML = '';
+  const currentPlayerGrid = getCurrentPlayerGrid(currentPlayerGameBoard);
+  const opponentGrid = getOpponentGrid(opponentGameBoard);
+  main.append(currentPlayerGrid, opponentGrid);
+}
+subscribe(ADD_GAME_BOARDS_TO_DISPLAY, setupDisplay);

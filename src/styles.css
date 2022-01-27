@@ -84,3 +84,9 @@ body {
   width: 28px;
   top: 11px;
 }
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+}
