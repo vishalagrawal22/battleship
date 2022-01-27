@@ -1,8 +1,13 @@
-import { ADD_GAME_BOARDS_TO_DISPLAY, HANDLE_ATTACK } from './topic';
+import {
+  ADD_GAME_BOARDS_TO_DISPLAY,
+  HANDLE_ATTACK,
+  ADD_WINNER_TO_DISPLAY,
+} from './topic';
 import { publish, subscribe } from './topic-manager';
 
-function createGrid(num_of_rows, num_of_columns) {
+function createGrid(num_of_rows, num_of_columns, player_type) {
   const grid = document.createElement('article');
+  grid.setAttribute('data-player-type', player_type);
   for (let i = 0; i < num_of_rows; i++) {
     const row = document.createElement('div');
     row.className = 'row';
@@ -82,7 +87,11 @@ function markDestroyedCells(grid, gameboard) {
 }
 
 function getCurrentPlayerGrid(gameboard) {
-  const grid = createGrid(gameboard.num_of_rows, gameboard.num_of_columns);
+  const grid = createGrid(
+    gameboard.num_of_rows,
+    gameboard.num_of_columns,
+    'current'
+  );
   markDestroyedCells(grid, gameboard);
   massAddShipsToGrid(grid, gameboard.ships);
   return grid;
@@ -118,7 +127,11 @@ function setupAttackListener(grid, gameboard) {
 }
 
 function getOpponentGrid(gameboard) {
-  const grid = createGrid(gameboard.num_of_rows, gameboard.num_of_columns);
+  const grid = createGrid(
+    gameboard.num_of_rows,
+    gameboard.num_of_columns,
+    'opponent'
+  );
   markSuccessfullyDestroyedShipParts(grid, gameboard);
   markDestroyedCells(grid, gameboard);
   setupAttackListener(grid, gameboard);
@@ -133,3 +146,15 @@ function setupDisplay(topic, { currentPlayerGameBoard, opponentGameBoard }) {
   main.append(currentPlayerGrid, opponentGrid);
 }
 subscribe(ADD_GAME_BOARDS_TO_DISPLAY, setupDisplay);
+
+function addWinnerToDisplay(
+  topic,
+  { winner, currentPlayerGameBoard, opponentGameBoard }
+) {
+  const verdict = document.querySelector('.verdict');
+  verdict.textContent = `${winner} won!`;
+  setupDisplay(null, { currentPlayerGameBoard, opponentGameBoard });
+  const opponentGrid = document.querySelector('[data-player-type="opponent"]');
+  disableAttackListeners(opponentGrid);
+}
+subscribe(ADD_WINNER_TO_DISPLAY, addWinnerToDisplay);
