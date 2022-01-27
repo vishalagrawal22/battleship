@@ -1,21 +1,21 @@
 import gameBoardFactory from './game-board';
 
-function playerFactory(n, m, name) {
-  let board = gameBoardFactory(n, m);
-  return { name, board };
+function playerFactory(num_of_rows, num_of_columns, name) {
+  let gameboard = gameBoardFactory(num_of_rows, num_of_columns);
+  return { name, gameboard };
 }
 
-function computerFactory(n, m, name) {
-  let { board } = playerFactory(n, m, name);
+function computerFactory(num_of_rows, num_of_columns, name) {
+  let { gameboard } = playerFactory(num_of_rows, num_of_columns, name);
   let moves = [];
-  for (let x = 1; x <= n; x++) {
-    for (let y = 1; y <= m; y++) {
+  for (let x = 1; x <= num_of_rows; x++) {
+    for (let y = 1; y <= num_of_columns; y++) {
       moves.push({ x, y });
     }
   }
 
-  let getRandomInt = (n) => {
-    let value = Math.floor(Math.random() * n);
+  let getRandomInt = (upper_bound) => {
+    let value = Math.floor(Math.random() * upper_bound);
     return value;
   };
 
@@ -29,7 +29,7 @@ function computerFactory(n, m, name) {
     return move;
   };
 
-  return { name, board, getMove };
+  return { name, gameboard, getMove };
 }
 
 export { computerFactory, playerFactory };
