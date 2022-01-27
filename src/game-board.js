@@ -1,10 +1,10 @@
-function gameBoardFactory(n, m) {
+function gameBoardFactory(num_of_rows, num_of_columns) {
   let ships = [];
-  let grid = new Array(n + 1);
-  let isAttacked = new Array(n + 1);
+  let grid = new Array(num_of_rows + 1);
+  let isAttacked = new Array(num_of_rows + 1);
   for (let i = 0; i < grid.length; i++) {
-    grid[i] = new Array(m + 1);
-    isAttacked[i] = new Array(m + 1);
+    grid[i] = new Array(num_of_columns + 1);
+    isAttacked[i] = new Array(num_of_columns + 1);
     for (let j = 0; j < grid[i].length; j++) {
       grid[i][j] = -1;
       isAttacked[i][j] = false;
@@ -79,7 +79,15 @@ function gameBoardFactory(n, m) {
     }, true);
   };
 
-  return { addShip, attack, canAttack, isGameOver, isEmpty };
+  return {
+    num_of_rows,
+    num_of_columns,
+    addShip,
+    attack,
+    canAttack,
+    isGameOver,
+    isEmpty,
+  };
 }
 
 export default gameBoardFactory;
