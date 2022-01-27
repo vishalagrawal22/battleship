@@ -82,6 +82,7 @@ function gameBoardFactory(num_of_rows, num_of_columns) {
   return {
     num_of_rows,
     num_of_columns,
+    ships,
     addShip,
     attack,
     canAttack,
