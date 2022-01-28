@@ -87,4 +87,11 @@ describe('gameboard object testing', () => {
     }
     expect(gameBoard.isGameOver()).toBe(true);
   });
+
+  test('add a valid ship touching the border', () => {
+    const borderXShip = shipFactory(9, 2, 2, 0);
+    const borderYShip = shipFactory(9, 8, 3, 1);
+    expect(gameBoard.addShip(borderXShip)).toBe(true);
+    expect(gameBoard.addShip(borderYShip)).toBe(true);
+  });
 });
