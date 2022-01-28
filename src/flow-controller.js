@@ -108,7 +108,7 @@ function gameFactory(mode, players) {
     });
   }
 
-  return { init, end };
+  return { init, end, isGameOver };
 }
 
 const playersShipsData = [
@@ -180,14 +180,16 @@ const computerShipsData = [
 publish(INIT_DOM, {});
 
 let game = null;
-function endLastGame() {
-  game.end();
+function manageLastGame() {
+  if (!game.isGameOver()) {
+    game.end();
+  }
   game = null;
 }
 
 function handleStartGame(topic, {}) {
   if (game !== null) {
-    endLastGame();
+    manageLastGame();
   }
 
   const players = [
