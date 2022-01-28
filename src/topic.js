@@ -15,13 +15,25 @@ const INIT_DOM = 'DOM: Initialize';
 // data: { }
 
 const HANDLE_START_GAME = 'Controller: start game';
-// data: { }
+// data: { playerName, computerName }
 
 const ADD_SHIP_TO_DISPLAY = 'DOM: add ship to display';
 // data: { ship }
 
+const ADD_ERROR_TO_DISPLAY = 'DOM: add error to display';
+// data: { error }
+
+const ADD_INFO_TO_DISPLAY = 'DOM: add info to display';
+// data: { info }
+
+const DOM_START_GAME = 'DOM: start game';
+// data: { currentPlayerGameBoard, opponentGameBoard }
+
 export {
   ADD_GAME_BOARDS_TO_DISPLAY,
+  ADD_ERROR_TO_DISPLAY,
+  ADD_INFO_TO_DISPLAY,
+  DOM_START_GAME,
   HANDLE_ATTACK,
   ADD_VERDICT_TO_DISPLAY,
   HANDLE_ADD_SHIP,

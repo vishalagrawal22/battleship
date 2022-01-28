@@ -178,3 +178,7 @@ header {
   justify-content: center;
   background-color: cadetblue;
 }
+
+.hidden {
+  display: none;
+}

@@ -9,6 +9,9 @@ import {
   HANDLE_START_GAME,
   ADD_SHIP_TO_DISPLAY,
   HANDLE_ADD_SHIP,
+  ADD_ERROR_TO_DISPLAY,
+  ADD_INFO_TO_DISPLAY,
+  DOM_START_GAME,
 } from './topic';
 import gameBoardFactory from './game-board';
 
@@ -100,7 +103,10 @@ function gameFactory(mode, players) {
   tokens.push(handleAttackToken);
 
   function init() {
-    updateDisplay(getCurrentPlayerBoard(), getOpponentBoard());
+    publish(DOM_START_GAME, {
+      currentPlayerGameBoard: getCurrentPlayerBoard(),
+      opponentGameBoard: getOpponentBoard(),
+    });
   }
 
   function end(verdict = 'game aborted') {
@@ -118,6 +124,7 @@ let checkerGameBoard = gameBoardFactory(10, 10);
 
 function handleAddShip(topic, { start_x, start_y, length, isVertical }) {
   const ship = shipFactory(start_x, start_y, length, isVertical);
+  let error = '';
   if (checkerGameBoard.addShip(ship)) {
     playersShipsData.push({
       start_x,
@@ -128,7 +135,13 @@ function handleAddShip(topic, { start_x, start_y, length, isVertical }) {
     publish(ADD_SHIP_TO_DISPLAY, {
       ship,
     });
+  } else {
+    error = 'Place the ship correctly';
   }
+
+  publish(ADD_ERROR_TO_DISPLAY, {
+    error,
+  });
 }
 subscribe(HANDLE_ADD_SHIP, handleAddShip);
 
@@ -175,14 +188,14 @@ function manageLastGame() {
   game = null;
 }
 
-function handleStartGame(topic, {}) {
+function handleStartGame(topic, { playerName, computerName }) {
   if (game !== null) {
     manageLastGame();
   }
 
   const players = [
-    playerFactory(10, 10, 'player1'),
-    computerFactory(10, 10, 'computer'),
+    playerFactory(10, 10, playerName),
+    computerFactory(10, 10, computerName),
   ];
 
   playersShipsData.forEach((shipData) => {

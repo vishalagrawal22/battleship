@@ -10,8 +10,10 @@
     <main>
       <section class="user-input-section">
         <form novalidate>
-          <label for="player-name">Name:</label>
-          <input id="player-name" type="text" required />
+          <label for="player-name">Player Name:</label>
+          <input id="player-name" type="text" value="Alice" required />
+          <label for="computer-name">Computer Name:</label>
+          <input id="computer-name" type="text" value="Bob" required />
         </form>
         <section class="ship-section">
           Ships
@@ -29,9 +31,7 @@
         </section>
       </section>
       <section class="info-section">
-        <p class="instructions">
-          Drag and drop ships on your board (double click the ship to rotate it)
-        </p>
+        <p class="instructions"></p>
         <p class="error"></p>
       </section>
       <section class="verdict-section">

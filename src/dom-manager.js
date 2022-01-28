@@ -6,6 +6,9 @@ import {
   ADD_SHIP_TO_DISPLAY,
   HANDLE_START_GAME,
   INIT_DOM,
+  ADD_ERROR_TO_DISPLAY,
+  ADD_INFO_TO_DISPLAY,
+  DOM_START_GAME,
 } from './topic';
 import gameBoardFactory from './game-board';
 import { publish, subscribe } from './topic-manager';
@@ -255,10 +258,61 @@ function setupDraggableShips() {
   });
 }
 
+function startGame(topic, { currentPlayerGameBoard, opponentGameBoard }) {
+  const shipSection = document.querySelector('.ship-section');
+  const form = document.querySelector('form');
+  const startButton = document.querySelector('.start');
+  const verdictSpan = document.querySelector('.verdict');
+  verdictSpan.textContent = '';
+  shipSection.classList.add('hidden');
+  form.classList.add('hidden');
+  startButton.textContent = 'Restart';
+
+  publish(ADD_GAME_BOARDS_TO_DISPLAY, {
+    currentPlayerGameBoard,
+    opponentGameBoard,
+  });
+
+  publish(ADD_INFO_TO_DISPLAY, {
+    info: 'Click on enemy grid cells to attack',
+  });
+}
+subscribe(DOM_START_GAME, startGame);
+
+function addErrorToDisplay(topic, { error }) {
+  const errorPara = document.querySelector('.error');
+  errorPara.textContent = error;
+}
+subscribe(ADD_ERROR_TO_DISPLAY, addErrorToDisplay);
+
+function addInfoToDisplay(topic, { info }) {
+  const infoPara = document.querySelector('.instructions');
+  infoPara.textContent = info;
+}
+subscribe(ADD_INFO_TO_DISPLAY, addInfoToDisplay);
+
 function setupStartButton() {
   const start = document.querySelector('.start');
+  const playerName = document.querySelector('#player-name');
+  const computerName = document.querySelector('#computer-name');
   start.addEventListener('click', () => {
-    publish(HANDLE_START_GAME, {});
+    const dragShipsContainer = document.querySelector('.drag-ships');
+    let error = '';
+    if (playerName.validity.valueMissing) {
+      error = 'Enter player name';
+    } else if (computerName.validity.valueMissing) {
+      error = 'Enter computer name';
+    } else if (dragShipsContainer.children.length !== 0) {
+      error = 'Place all your ships first';
+    } else {
+      publish(HANDLE_START_GAME, {
+        playerName: playerName.value,
+        computerName: computerName.value,
+      });
+    }
+    publish(ADD_ERROR_TO_DISPLAY, {
+      error,
+    });
   });
 }
 
