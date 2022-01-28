@@ -14,10 +14,14 @@ const HANDLE_ADD_SHIP = 'Controller: handle add ship';
 const INIT_DOM = 'DOM: Initialize';
 // data: { }
 
+const HANDLE_START_GAME = 'Controller: start game';
+// data: { }
+
 export {
   ADD_GAME_BOARDS_TO_DISPLAY,
   HANDLE_ATTACK,
   ADD_VERDICT_TO_DISPLAY,
   HANDLE_ADD_SHIP,
   INIT_DOM,
+  HANDLE_START_GAME,
 };

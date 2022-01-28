@@ -120,3 +120,8 @@ main {
 .vertical {
   flex-direction: column;
 }
+
+.start {
+  padding: 8px 16px;
+  font-size: 16px;
+}

@@ -7,6 +7,7 @@ import {
   HANDLE_ATTACK,
   ADD_VERDICT_TO_DISPLAY,
   INIT_DOM,
+  HANDLE_START_GAME,
 } from './topic';
 
 function updateDisplay(currentPlayerGameBoard, opponentGameBoard) {
@@ -110,36 +111,111 @@ function gameFactory(mode, players) {
   return { init, end };
 }
 
-const players = [
-  playerFactory(10, 10, 'player1'),
-  computerFactory(10, 10, 'computer'),
+const playersShipsData = [
+  {
+    start_x: 2,
+    start_y: 8,
+    length: 2,
+    isVertical: false,
+  },
+  {
+    start_x: 9,
+    start_y: 2,
+    length: 3,
+    isVertical: true,
+  },
+  {
+    start_x: 9,
+    start_y: 8,
+    length: 3,
+    isVertical: true,
+  },
+  {
+    start_x: 6,
+    start_y: 6,
+    length: 4,
+    isVertical: true,
+  },
+  {
+    start_x: 1,
+    start_y: 4,
+    length: 5,
+    isVertical: false,
+  },
 ];
 
-const playersShips = [
-  shipFactory(2, 8, 2, 0),
-  shipFactory(9, 8, 3, 1),
-  shipFactory(9, 2, 3, 1),
-  shipFactory(6, 6, 4, 1),
-  shipFactory(1, 4, 5, 0),
+const computerShipsData = [
+  {
+    start_x: 2,
+    start_y: 8,
+    length: 2,
+    isVertical: false,
+  },
+  {
+    start_x: 9,
+    start_y: 2,
+    length: 3,
+    isVertical: true,
+  },
+  {
+    start_x: 9,
+    start_y: 8,
+    length: 3,
+    isVertical: true,
+  },
+  {
+    start_x: 6,
+    start_y: 6,
+    length: 4,
+    isVertical: true,
+  },
+  {
+    start_x: 1,
+    start_y: 4,
+    length: 5,
+    isVertical: false,
+  },
 ];
-
-playersShips.forEach((ship) => {
-  players[0].gameboard.addShip(ship);
-});
-
-const computerShips = [
-  shipFactory(2, 8, 2, 0),
-  shipFactory(9, 8, 3, 1),
-  shipFactory(9, 2, 3, 1),
-  shipFactory(6, 6, 4, 1),
-  shipFactory(1, 4, 5, 0),
-];
-
-computerShips.forEach((ship) => {
-  players[1].gameboard.addShip(ship);
-});
 
 publish(INIT_DOM, {});
 
-let game = gameFactory('VS Computer', players);
-game.init();
+let game = null;
+function endLastGame() {
+  game.end();
+  game = null;
+}
+
+function handleStartGame(topic, {}) {
+  if (game !== null) {
+    endLastGame();
+  }
+
+  const players = [
+    playerFactory(10, 10, 'player1'),
+    computerFactory(10, 10, 'computer'),
+  ];
+
+  playersShipsData.forEach((shipData) => {
+    const ship = shipFactory(
+      shipData.start_x,
+      shipData.start_y,
+      shipData.length,
+      shipData.isVertical
+    );
+    players[0].gameboard.addShip(ship);
+  });
+
+  computerShipsData.forEach((shipData) => {
+    const ship = shipFactory(
+      shipData.start_x,
+      shipData.start_y,
+      shipData.length,
+      shipData.isVertical
+    );
+    players[1].gameboard.addShip(ship);
+  });
+
+  game = gameFactory('VS Computer', players);
+  game.init();
+}
+subscribe(HANDLE_START_GAME, handleStartGame);

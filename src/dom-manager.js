@@ -3,6 +3,7 @@ import {
   HANDLE_ATTACK,
   ADD_VERDICT_TO_DISPLAY,
   HANDLE_ADD_SHIP,
+  HANDLE_START_GAME,
   INIT_DOM,
 } from './topic';
 import { publish, subscribe } from './topic-manager';
@@ -243,7 +244,19 @@ function setupDraggableShips() {
   });
 }
 
+function setupStartButton() {
+  const start = document.querySelector('.start');
+  start.addEventListener('click', () => {
+    publish(HANDLE_START_GAME, {});
+  });
+}
+
+function setupActionButtons() {
+  setupStartButton();
+}
+
 function initializeDOM(topic, {}) {
   setupDraggableShips();
+  setupActionButtons();
 }
 subscribe(INIT_DOM, initializeDOM);
