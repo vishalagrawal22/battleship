@@ -12,22 +12,22 @@ function gameBoardFactory(num_of_rows, num_of_columns) {
   }
 
   let checkValid = (ship) => {
-    if (!(0 <= ship.start_x && ship.start_x < num_of_columns)) {
+    if (!(1 <= ship.start_x && ship.start_x <= num_of_columns)) {
       return false;
     }
 
-    if (!(0 <= ship.start_y && ship.start_y < num_of_rows)) {
+    if (!(1 <= ship.start_y && ship.start_y <= num_of_rows)) {
       return false;
     }
 
     if (ship.isVertical) {
       const end_y = ship.start_y + ship.length - 1;
-      if (!(0 <= end_y && end_y < num_of_rows)) {
+      if (!(1 <= end_y && end_y <= num_of_rows)) {
         return false;
       }
     } else {
       const end_x = ship.start_x + ship.length - 1;
-      if (!(0 <= end_x && end_x < num_of_columns)) {
+      if (!(1 <= end_x && end_x <= num_of_columns)) {
         return false;
       }
     }
