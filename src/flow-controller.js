@@ -1,16 +1,36 @@
-import { publish, subscribe } from './topic-manager';
+import { publish, subscribe, unsubscribe } from './topic-manager';
 import gameBoardFactory from './game-board';
 import shipFactory from './ship-factory';
 import { playerFactory, computerFactory } from './player-factory';
 import {
   ADD_GAME_BOARDS_TO_DISPLAY,
   HANDLE_ATTACK,
-  ADD_WINNER_TO_DISPLAY,
+  ADD_VERDICT_TO_DISPLAY,
   INIT_DOM,
 } from './topic';
 
+function updateDisplay(currentPlayerGameBoard, opponentGameBoard) {
+  publish(ADD_GAME_BOARDS_TO_DISPLAY, {
+    currentPlayerGameBoard,
+    opponentGameBoard,
+  });
+}
+
+function addVerdictToDisplay(
+  verdict,
+  currentPlayerGameBoard,
+  opponentGameBoard
+) {
+  publish(ADD_VERDICT_TO_DISPLAY, {
+    verdict,
+    currentPlayerGameBoard,
+    opponentGameBoard,
+  });
+}
+
 function gameFactory(mode, players) {
   let currentPlayer = 0;
+  let tokens = [];
   function changeCurrentPlayer() {
     currentPlayer = 1 - currentPlayer;
   }
@@ -23,13 +43,12 @@ function gameFactory(mode, players) {
     return 1 - currentPlayer;
   }
 
-  function updateDisplay() {
-    const currentPlayerGameBoard = players[getCurrentPlayer()].gameboard;
-    const opponentGameBoard = players[getOpponent()].gameboard;
-    publish(ADD_GAME_BOARDS_TO_DISPLAY, {
-      currentPlayerGameBoard,
-      opponentGameBoard,
-    });
+  function getCurrentPlayerBoard() {
+    return players[getCurrentPlayer()].gameboard;
+  }
+
+  function getOpponentBoard() {
+    return players[getOpponent()].gameboard;
   }
 
   function isGameOver() {
@@ -40,14 +59,6 @@ function gameFactory(mode, players) {
   function registerAttack(x, y) {
     const opponentGameBoard = players[getOpponent()].gameboard;
     opponentGameBoard.attack(x, y);
-  }
-
-  function endGame(winner, currentPlayerGameBoard, opponentGameBoard) {
-    publish(ADD_WINNER_TO_DISPLAY, {
-      winner,
-      currentPlayerGameBoard,
-      opponentGameBoard,
-    });
   }
 
   function manageNextMove() {
@@ -62,12 +73,11 @@ function gameFactory(mode, players) {
       gameOver = isGameOver();
       if (gameOver) {
         const winner = players[getCurrentPlayer()].name;
-        // here we switch boards because current player is computer
-        const currentPlayerGameBoard = players[getOpponent()].gameboard;
-        const opponentGameBoard = players[getCurrentPlayer()].gameboard;
-        endGame(winner, currentPlayerGameBoard, opponentGameBoard);
+        changeCurrentPlayer();
+        end(`${winner} won!`);
+      } else {
+        changeCurrentPlayer();
       }
-      changeCurrentPlayer();
     }
     return { gameOver };
   }
@@ -76,22 +86,28 @@ function gameFactory(mode, players) {
     registerAttack(x, y);
     if (isGameOver()) {
       const winner = players[getCurrentPlayer()].name;
-      const currentPlayerGameBoard = players[getCurrentPlayer()].gameboard;
-      const opponentGameBoard = players[getOpponent()].gameboard;
-      endGame(winner, currentPlayerGameBoard, opponentGameBoard);
+      end(`${winner} won!`);
     } else {
       if (!manageNextMove().gameOver) {
-        updateDisplay();
+        updateDisplay(getCurrentPlayerBoard(), getOpponentBoard());
       }
     }
   }
-  subscribe(HANDLE_ATTACK, handleAttack);
+  const handleAttackToken = subscribe(HANDLE_ATTACK, handleAttack);
+  tokens.push(handleAttackToken);
 
   function init() {
-    updateDisplay();
+    updateDisplay(getCurrentPlayerBoard(), getOpponentBoard());
   }
 
-  return { init };
+  function end(verdict = 'game aborted') {
+    addVerdictToDisplay(verdict, getCurrentPlayerBoard(), getOpponentBoard());
+    tokens.forEach((token) => {
+      unsubscribe(token);
+    });
+  }
+
+  return { init, end };
 }
 
 const players = [
@@ -99,15 +115,15 @@ const players = [
   computerFactory(10, 10, 'computer'),
 ];
 
-const playerShip = [
-  shipFactory(3, 5, 2, 1),
-  shipFactory(9, 4, 3, 1),
-  shipFactory(2, 1, 3, 0),
-  shipFactory(5, 6, 4, 1),
-  shipFactory(2, 3, 5, 0),
+const playersShips = [
+  shipFactory(2, 8, 2, 0),
+  shipFactory(9, 8, 3, 1),
+  shipFactory(9, 2, 3, 1),
+  shipFactory(6, 6, 4, 1),
+  shipFactory(1, 4, 5, 0),
 ];
 
-playerShip.forEach((ship) => {
+playersShips.forEach((ship) => {
   players[0].gameboard.addShip(ship);
 });
 
@@ -123,7 +139,7 @@ computerShips.forEach((ship) => {
   players[1].gameboard.addShip(ship);
 });
 
+publish(INIT_DOM, {});
+
 let game = gameFactory('VS Computer', players);
 game.init();
-
-publish(INIT_DOM, {});

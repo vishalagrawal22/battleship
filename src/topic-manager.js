@@ -1,4 +1,8 @@
-import { subscribe as sub, publish as pub } from 'pubsub-js';
+import {
+  subscribe as sub,
+  publish as pub,
+  unsubscribe as unsub,
+} from 'pubsub-js';
 
 function subscribe(topic, callback) {
   return sub(topic, callback);
@@ -8,4 +12,8 @@ function publish(topic, data) {
   return pub(topic, data);
 }
 
-export { subscribe, publish };
+function unsubscribe(token) {
+  return unsub(token);
+}
+
+export { subscribe, publish, unsubscribe };

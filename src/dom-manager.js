@@ -1,7 +1,7 @@
 import {
   ADD_GAME_BOARDS_TO_DISPLAY,
   HANDLE_ATTACK,
-  ADD_WINNER_TO_DISPLAY,
+  ADD_VERDICT_TO_DISPLAY,
   HANDLE_ADD_SHIP,
   INIT_DOM,
 } from './topic';
@@ -185,17 +185,17 @@ function setupDisplay(topic, { currentPlayerGameBoard, opponentGameBoard }) {
 }
 subscribe(ADD_GAME_BOARDS_TO_DISPLAY, setupDisplay);
 
-function addWinnerToDisplay(
+function addVerdictToDisplay(
   topic,
-  { winner, currentPlayerGameBoard, opponentGameBoard }
+  { verdict, currentPlayerGameBoard, opponentGameBoard }
 ) {
-  const verdict = document.querySelector('.verdict');
-  verdict.textContent = `${winner} won!`;
+  const verdictElement = document.querySelector('.verdict');
+  verdictElement.textContent = verdict;
   setupDisplay(null, { currentPlayerGameBoard, opponentGameBoard });
   const opponentGrid = document.querySelector('[data-player-type="opponent"]');
   disableAttackListeners(opponentGrid);
 }
-subscribe(ADD_WINNER_TO_DISPLAY, addWinnerToDisplay);
+subscribe(ADD_VERDICT_TO_DISPLAY, addVerdictToDisplay);
 
 function setupDraggableShips() {
   const shipLengths = [5, 4, 3, 3, 2];
