@@ -6,23 +6,38 @@
     <script src="bundle.js" defer></script>
   </head>
   <body>
-    <section>
-      <h1>Ships</h1>
-      <div class="drag-ships">
-        <div id="carrier"></div>
-        <div id="battleship"></div>
-        <div id="cruiser"></div>
-        <div id="submarine"></div>
-        <div id="destroyer"></div>
-      </div>
-    </section>
-    <main></main>
-    <button class="start">Start</button>
-    <section>
-      <h1>
+    <header>Battleship</header>
+    <main>
+      <section class="user-input-section">
+        <form novalidate>
+          <label for="player-name">Name:</label>
+          <input id="player-name" type="text" required />
+        </form>
+        <section class="ship-section">
+          Ships
+          <div class="drag-ships">
+            <div id="carrier"></div>
+            <div id="battleship"></div>
+            <div id="cruiser"></div>
+            <div id="submarine"></div>
+            <div id="destroyer"></div>
+          </div>
+        </section>
+        <section class="action-buttons-section">
+          <button class="start">Start</button>
+          <button class="reset">Reset</button>
+        </section>
+      </section>
+      <section class="info-section">
+        <p class="instructions">Drag and drop ships on your board</p>
+        <p class="error"></p>
+      </section>
+      <section class="verdict-section">
         Verdict:
         <span class="verdict"></span>
-      </h1>
-    </section>
+      </section>
+      <section class="game-boards-section"></section>
+    </main>
+    <footer>Created by Vishal Agrawal</footer>
   </body>
 </html>

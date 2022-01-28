@@ -1,5 +1,4 @@
 import { publish, subscribe, unsubscribe } from './topic-manager';
-import gameBoardFactory from './game-board';
 import shipFactory from './ship-factory';
 import { playerFactory, computerFactory } from './player-factory';
 import {

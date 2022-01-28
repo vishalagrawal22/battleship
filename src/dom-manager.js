@@ -6,6 +6,7 @@ import {
   HANDLE_START_GAME,
   INIT_DOM,
 } from './topic';
+import gameBoardFactory from './game-board';
 import { publish, subscribe } from './topic-manager';
 
 function createGrid(num_of_rows, num_of_columns, player_type) {
@@ -173,16 +174,16 @@ function getOpponentGrid(gameboard) {
   );
   markSuccessfullyDestroyedShipParts(grid, gameboard);
   markDestroyedCells(grid, gameboard);
-  setupAttackListener(grid, gameboard);
   return grid;
 }
 
 function setupDisplay(topic, { currentPlayerGameBoard, opponentGameBoard }) {
-  const main = document.querySelector('main');
-  main.innerHTML = '';
+  const gameBoardsSection = document.querySelector('.game-boards-section');
+  gameBoardsSection.innerHTML = '';
   const currentPlayerGrid = getCurrentPlayerGrid(currentPlayerGameBoard);
   const opponentGrid = getOpponentGrid(opponentGameBoard);
-  main.append(currentPlayerGrid, opponentGrid);
+  setupAttackListener(opponentGrid, opponentGameBoard);
+  gameBoardsSection.append(currentPlayerGrid, opponentGrid);
 }
 subscribe(ADD_GAME_BOARDS_TO_DISPLAY, setupDisplay);
 
@@ -255,8 +256,17 @@ function setupActionButtons() {
   setupStartButton();
 }
 
+function setupDummyGameBoards() {
+  const gameBoardsSection = document.querySelector('.game-boards-section');
+  const dummyGameboard = gameBoardFactory(10, 10);
+  const currentPlayerGrid = getCurrentPlayerGrid(dummyGameboard);
+  const opponentGrid = getOpponentGrid(dummyGameboard);
+  gameBoardsSection.append(currentPlayerGrid, opponentGrid);
+}
+
 function initializeDOM(topic, {}) {
   setupDraggableShips();
+  setupDummyGameBoards();
   setupActionButtons();
 }
 subscribe(INIT_DOM, initializeDOM);
