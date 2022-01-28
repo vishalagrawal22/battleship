@@ -15,7 +15,7 @@ function computerFactory(num_of_rows, num_of_columns, name) {
   }
 
   let getRandomInt = (upper_bound) => {
-    let value = Math.floor(Math.random() * upper_bound);
+    let value = Math.floor(Math.random() * (upper_bound + 1));
     return value;
   };
 
