@@ -9,6 +9,8 @@ import {
   ADD_ERROR_TO_DISPLAY,
   ADD_INFO_TO_DISPLAY,
   DOM_START_GAME,
+  HANDLE_RESET_GAME,
+  DOM_RESET_GAME,
 } from './topic';
 import gameBoardFactory from './game-board';
 import { publish, subscribe } from './topic-manager';
@@ -214,8 +216,19 @@ subscribe(ADD_VERDICT_TO_DISPLAY, addVerdictToDisplay);
 
 function setupDraggableShips() {
   const shipLengths = [5, 4, 3, 3, 2];
-  const ships = Array.from(document.querySelector('.drag-ships').children);
-  ships.forEach((ship, index) => {
+  const shipIDs = [
+    'Carrier',
+    'Battleship',
+    'Cruiser',
+    'Submarine',
+    'Destroyer',
+  ];
+  const dragShips = document.querySelector('.drag-ships');
+  dragShips.innerHTML = '';
+  for (let index = 0; index < shipLengths.length; index++) {
+    const ship = document.createElement('div');
+    ship.id = shipIDs[index];
+
     ship.setAttribute('draggable', 'true');
     ship.setAttribute('data-length', shipLengths[index]);
 
@@ -255,7 +268,9 @@ function setupDraggableShips() {
       }
       ship.classList.toggle('vertical');
     });
-  });
+
+    dragShips.append(ship);
+  }
 }
 
 function startGame(topic, { currentPlayerGameBoard, opponentGameBoard }) {
@@ -278,6 +293,30 @@ function startGame(topic, { currentPlayerGameBoard, opponentGameBoard }) {
   });
 }
 subscribe(DOM_START_GAME, startGame);
+
+function resetGame(topic, {}) {
+  const shipSection = document.querySelector('.ship-section');
+  const form = document.querySelector('form');
+  const startButton = document.querySelector('.start');
+  const verdictSpan = document.querySelector('.verdict');
+  verdictSpan.textContent = '';
+  if (shipSection.classList.contains('hidden')) {
+    shipSection.classList.remove('hidden');
+  }
+
+  if (form.classList.contains('hidden')) {
+    form.classList.remove('hidden');
+  }
+  startButton.textContent = 'Start';
+
+  setupDraggableShips();
+  setupDummyGameBoards();
+
+  publish(ADD_INFO_TO_DISPLAY, {
+    info: 'Drag and drop ships on your grid (double click the ship to rotate)',
+  });
+}
+subscribe(DOM_RESET_GAME, resetGame);
 
 function addErrorToDisplay(topic, { error }) {
   const errorPara = document.querySelector('.error');
@@ -316,12 +355,21 @@ function setupStartButton() {
   });
 }
 
+function setupResetButton() {
+  const reset = document.querySelector('.reset');
+  reset.addEventListener('click', () => {
+    publish(HANDLE_RESET_GAME, {});
+  });
+}
+
 function setupActionButtons() {
   setupStartButton();
+  setupResetButton();
 }
 
 function setupDummyGameBoards() {
   const gameBoardsSection = document.querySelector('.game-boards-section');
+  gameBoardsSection.innerHTML = '';
   const dummyGameboard = gameBoardFactory(10, 10);
   const currentPlayerGrid = getCurrentPlayerGrid(dummyGameboard);
   const opponentGrid = getOpponentGrid(dummyGameboard);
@@ -329,8 +377,7 @@ function setupDummyGameBoards() {
 }
 
 function initializeDOM(topic, {}) {
-  setupDraggableShips();
-  setupDummyGameBoards();
+  publish(HANDLE_RESET_GAME, {});
   setupActionButtons();
 }
 subscribe(INIT_DOM, initializeDOM);

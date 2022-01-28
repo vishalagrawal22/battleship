@@ -10,8 +10,9 @@ import {
   ADD_SHIP_TO_DISPLAY,
   HANDLE_ADD_SHIP,
   ADD_ERROR_TO_DISPLAY,
-  ADD_INFO_TO_DISPLAY,
+  DOM_RESET_GAME,
   DOM_START_GAME,
+  HANDLE_RESET_GAME,
 } from './topic';
 import gameBoardFactory from './game-board';
 
@@ -182,7 +183,7 @@ publish(INIT_DOM, {});
 
 let game = null;
 function manageLastGame() {
-  if (!game.isGameOver()) {
+  if (game !== null && !game.isGameOver()) {
     game.end();
   }
   game = null;
@@ -222,3 +223,11 @@ function handleStartGame(topic, { playerName, computerName }) {
   game.init();
 }
 subscribe(HANDLE_START_GAME, handleStartGame);
+
+function handleResetGame(topic, {}) {
+  manageLastGame();
+  playersShipsData = [];
+  checkerGameBoard = gameBoardFactory(10, 10);
+  publish(DOM_RESET_GAME, {});
+}
+subscribe(HANDLE_RESET_GAME, handleResetGame);
