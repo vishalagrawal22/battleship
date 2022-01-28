@@ -3,6 +3,7 @@ import {
   HANDLE_ATTACK,
   ADD_VERDICT_TO_DISPLAY,
   HANDLE_ADD_SHIP,
+  ADD_SHIP_TO_DISPLAY,
   HANDLE_START_GAME,
   INIT_DOM,
 } from './topic';
@@ -73,6 +74,16 @@ function addShipToGrid(grid, ship) {
   }
 }
 
+function addShipToDisplay(topic, { ship }) {
+  const shipElement = document.querySelector(`[data-length="${ship.length}"]`);
+  shipElement.remove();
+  const currentPlayerGrid = document.querySelector(
+    `[data-player-type="current"]`
+  );
+  addShipToGrid(currentPlayerGrid, ship);
+}
+subscribe(ADD_SHIP_TO_DISPLAY, addShipToDisplay);
+
 function massAddShipsToGrid(grid, ships) {
   ships.forEach((ship) => {
     addShipToGrid(grid, ship);
@@ -118,7 +129,6 @@ function setupDropZone(grid, gameboard) {
           start_y,
           length,
           isVertical,
-          id,
         });
       });
     }

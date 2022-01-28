@@ -7,7 +7,10 @@ import {
   ADD_VERDICT_TO_DISPLAY,
   INIT_DOM,
   HANDLE_START_GAME,
+  ADD_SHIP_TO_DISPLAY,
+  HANDLE_ADD_SHIP,
 } from './topic';
+import gameBoardFactory from './game-board';
 
 function updateDisplay(currentPlayerGameBoard, opponentGameBoard) {
   publish(ADD_GAME_BOARDS_TO_DISPLAY, {
@@ -110,38 +113,24 @@ function gameFactory(mode, players) {
   return { init, end, isGameOver };
 }
 
-const playersShipsData = [
-  {
-    start_x: 2,
-    start_y: 8,
-    length: 2,
-    isVertical: false,
-  },
-  {
-    start_x: 9,
-    start_y: 2,
-    length: 3,
-    isVertical: true,
-  },
-  {
-    start_x: 9,
-    start_y: 8,
-    length: 3,
-    isVertical: true,
-  },
-  {
-    start_x: 6,
-    start_y: 6,
-    length: 4,
-    isVertical: true,
-  },
-  {
-    start_x: 1,
-    start_y: 4,
-    length: 5,
-    isVertical: false,
-  },
-];
+let playersShipsData = [];
+let checkerGameBoard = gameBoardFactory(10, 10);
+
+function handleAddShip(topic, { start_x, start_y, length, isVertical }) {
+  const ship = shipFactory(start_x, start_y, length, isVertical);
+  if (checkerGameBoard.addShip(ship)) {
+    playersShipsData.push({
+      start_x,
+      start_y,
+      length,
+      isVertical,
+    });
+    publish(ADD_SHIP_TO_DISPLAY, {
+      ship,
+    });
+  }
+}
+subscribe(HANDLE_ADD_SHIP, handleAddShip);
 
 const computerShipsData = [
   {
