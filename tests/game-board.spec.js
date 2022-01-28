@@ -2,11 +2,10 @@ import shipFactory from '../src/ship-factory';
 import gameBoardFactory from '../src/game-board';
 
 describe('gameboard object testing', () => {
-  let verticalShip, horizontalShip, overlapShip, gameBoard;
+  let verticalShip, horizontalShip, gameBoard;
   beforeEach(() => {
     verticalShip = shipFactory(3, 2, 5, true);
     horizontalShip = shipFactory(1, 1, 3, false);
-    overlapShip = shipFactory(2, 3, 3, false);
     gameBoard = gameBoardFactory(10, 10);
   });
 
@@ -38,6 +37,7 @@ describe('gameboard object testing', () => {
 
   // this test will break if overlapping ship coordinates are changed
   test('can not add ship which conflicts', () => {
+    let overlapShip = shipFactory(2, 3, 3, false);
     expect(gameBoard.addShip(verticalShip)).toBe(true);
     expect(gameBoard.addShip(overlapShip)).toBe(false);
     expect(gameBoard.isEmpty(overlapShip.start_x, overlapShip.start_y)).toBe(
