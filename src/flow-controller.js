@@ -66,6 +66,7 @@ function gameFactory(mode, players) {
   function registerAttack(x, y) {
     const opponentGameBoard = players[getOpponent()].gameboard;
     opponentGameBoard.attack(x, y);
+    return !opponentGameBoard.isEmpty(x, y);
   }
 
   function manageNextMove() {
@@ -75,8 +76,9 @@ function gameFactory(mode, players) {
     } else {
       changeCurrentPlayer();
       const computer = players[getCurrentPlayer()];
-      const { x, y } = computer.getMove();
-      registerAttack(x, y);
+      const { x, y, feedback } = computer.getMove();
+      const wasSuccess = registerAttack(x, y);
+      feedback(wasSuccess);
       gameOver = isGameOver();
       if (gameOver) {
         const winner = players[getCurrentPlayer()].name;
