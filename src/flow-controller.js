@@ -146,39 +146,6 @@ function handleAddShip(topic, { start_x, start_y, length, isVertical }) {
 }
 subscribe(HANDLE_ADD_SHIP, handleAddShip);
 
-const computerShipsData = [
-  {
-    start_x: 2,
-    start_y: 8,
-    length: 2,
-    isVertical: false,
-  },
-  {
-    start_x: 9,
-    start_y: 2,
-    length: 3,
-    isVertical: true,
-  },
-  {
-    start_x: 9,
-    start_y: 8,
-    length: 3,
-    isVertical: true,
-  },
-  {
-    start_x: 6,
-    start_y: 6,
-    length: 4,
-    isVertical: true,
-  },
-  {
-    start_x: 1,
-    start_y: 4,
-    length: 5,
-    isVertical: false,
-  },
-];
-
 publish(INIT_DOM, {});
 
 let game = null;
@@ -189,16 +156,12 @@ function manageLastGame() {
   game = null;
 }
 
-function handleStartGame(topic, { playerName, computerName }) {
+async function handleStartGame(topic, { playerName, computerName }) {
   if (game !== null) {
     manageLastGame();
   }
 
-  const players = [
-    playerFactory(10, 10, playerName),
-    computerFactory(10, 10, computerName),
-  ];
-
+  const player = playerFactory(10, 10, playerName);
   playersShipsData.forEach((shipData) => {
     const ship = shipFactory(
       shipData.start_x,
@@ -206,18 +169,13 @@ function handleStartGame(topic, { playerName, computerName }) {
       shipData.length,
       shipData.isVertical
     );
-    players[0].gameboard.addShip(ship);
+    player.gameboard.addShip(ship);
   });
 
-  computerShipsData.forEach((shipData) => {
-    const ship = shipFactory(
-      shipData.start_x,
-      shipData.start_y,
-      shipData.length,
-      shipData.isVertical
-    );
-    players[1].gameboard.addShip(ship);
-  });
+  const computer = computerFactory(10, 10, computerName);
+  await computer.generateGrid([5, 4, 3, 3, 2]);
+
+  const players = [player, computer];
 
   game = gameFactory('VS Computer', players);
   game.init();
