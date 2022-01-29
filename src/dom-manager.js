@@ -289,7 +289,7 @@ function startGame(topic, { currentPlayerGameBoard, opponentGameBoard }) {
   });
 
   publish(ADD_INFO_TO_DISPLAY, {
-    info: 'Click on enemy grid cells to attack',
+    info: ['Click on enemy grid cells to attack'],
   });
 }
 subscribe(DOM_START_GAME, startGame);
@@ -313,7 +313,10 @@ function resetGame(topic, {}) {
   setupDummyGameBoards();
 
   publish(ADD_INFO_TO_DISPLAY, {
-    info: 'Drag and drop ships on your grid (double click the ship to rotate)',
+    info: [
+      'Drag and drop ships on your grid',
+      'Double click the ship to rotate',
+    ],
   });
 }
 subscribe(DOM_RESET_GAME, resetGame);
@@ -325,8 +328,13 @@ function addErrorToDisplay(topic, { error }) {
 subscribe(ADD_ERROR_TO_DISPLAY, addErrorToDisplay);
 
 function addInfoToDisplay(topic, { info }) {
-  const infoPara = document.querySelector('.instructions');
-  infoPara.textContent = info;
+  const infoList = document.querySelector('.instructions');
+  infoList.innerHTML = '';
+  for (let i = 0; i < info.length; i++) {
+    const infoItem = document.createElement('li');
+    infoItem.innerText = info[i];
+    infoList.append(infoItem);
+  }
 }
 subscribe(ADD_INFO_TO_DISPLAY, addInfoToDisplay);
 

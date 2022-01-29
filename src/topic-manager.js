@@ -9,7 +9,6 @@ function subscribe(topic, callback) {
 }
 
 function publish(topic, data) {
-  console.log({ topic, data });
   return pub(topic, data);
 }
 

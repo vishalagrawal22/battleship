@@ -28,6 +28,7 @@ const ADD_ERROR_TO_DISPLAY = 'DOM: add error to display';
 
 const ADD_INFO_TO_DISPLAY = 'DOM: add info to display';
 // data: { info }
+// info is an array of strings
 
 const DOM_START_GAME = 'DOM: start game';
 // data: { currentPlayerGameBoard, opponentGameBoard }
