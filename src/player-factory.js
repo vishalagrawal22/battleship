@@ -80,45 +80,72 @@ function computerFactory(num_of_rows, num_of_columns, name) {
   function destroyMoveFactory(start_x, start_y, end_x, end_y) {
     const type = 'destroy';
     const direction = {
-      x: Math.abs(start_x - end_x),
-      y: Math.abs(start_y - end_y),
+      x: end_x - start_x,
+      y: end_y - start_y,
     };
-    const startMove = moveFactory(start_x, start_y);
-    const endMove = moveFactory(end_x, end_y);
+    let startMove = moveFactory(start_x, start_y);
+    let endMove = moveFactory(end_x, end_y);
+
+    let isStartStopped = false;
+    let isEndStopped = false;
+
+    const stopStart = () => {
+      isStartStopped = true;
+    };
+
+    const stopEnd = () => {
+      isEndStopped = true;
+    };
 
     const checkStart = () => {
-      return startMove.check();
+      return startMove.check() && !isStartStopped;
     };
 
     const checkEnd = () => {
-      return endMove.check();
-    };
-
-    const extend = (move) => {
-      return moveFactory(move.x - direction.x, move.y - direction.y);
+      return endMove.check() && !isEndStopped;
     };
 
     const checkValidity = () => {
-      return checkStart() && checkEnd();
+      return checkStart() || checkEnd();
     };
 
     const extendStart = () => {
-      startMove = extend(startMove);
+      startMove = moveFactory(
+        startMove.x - direction.x,
+        startMove.y - direction.y
+      );
     };
 
     const extendEnd = () => {
-      endMove = extend(endMove);
+      endMove = moveFactory(endMove.x + direction.x, endMove.y + direction.y);
     };
+
+    const init = () => {
+      extendStart();
+      extendEnd();
+    };
+
+    const getStartMove = () => {
+      return startMove;
+    };
+
+    const getEndMove = () => {
+      return endMove;
+    };
+
+    init();
 
     return {
       type,
-      startMove,
-      endMove,
+      getStartMove,
+      getEndMove,
       checkValidity,
       checkEnd,
       checkStart,
       extendStart,
       extendEnd,
+      stopStart,
+      stopEnd,
     };
   }
 
@@ -162,9 +189,39 @@ function computerFactory(num_of_rows, num_of_columns, name) {
   }
 
   function feedback(move, wasSuccess) {
-    console.log(move);
-    if (wasSuccess) {
-      addSearchMoves(move.x, move.y);
+    if (destroyMove === null) {
+      if (wasSuccess) {
+        if (move.type === 'random') {
+          addSearchMoves(move.x, move.y);
+        } else if (move.type === 'search') {
+          searchMoves = [];
+          destroyMove = destroyMoveFactory(
+            move.x,
+            move.y,
+            move.parent_x,
+            move.parent_y
+          );
+        }
+      }
+    } else {
+      const startMove = destroyMove.getStartMove();
+      if (startMove.x === move.x && startMove.y === move.y) {
+        if (wasSuccess) {
+          destroyMove.extendStart();
+        } else {
+          destroyMove.stopStart();
+        }
+      } else {
+        if (wasSuccess) {
+          destroyMove.extendEnd();
+        } else {
+          destroyMove.stopEnd();
+        }
+      }
+
+      if (!destroyMove.checkValidity()) {
+        destroyMove = null;
+      }
     }
   }
 
@@ -174,7 +231,13 @@ function computerFactory(num_of_rows, num_of_columns, name) {
     }
 
     let move;
-    if (searchMoves.length !== 0) {
+    if (destroyMove !== null) {
+      if (destroyMove.checkStart()) {
+        move = destroyMove.getStartMove();
+      } else if (destroyMove.checkEnd()) {
+        move = destroyMove.getEndMove();
+      }
+    } else if (searchMoves.length !== 0) {
       move = searchMoves.pop();
     } else {
       let ind = getRandomInt(0, moves.length - 1);
