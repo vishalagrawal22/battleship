@@ -18,6 +18,7 @@
   ],
   "devDependencies": {
     "@babel/core": "^7.16.12",
+    "@babel/plugin-transform-runtime": "^7.16.10",
     "@babel/preset-env": "^7.16.11",
     "babel-jest": "^27.4.6",
     "babel-loader": "^8.2.3",
@@ -33,6 +34,7 @@
     "webpack-dev-server": "^4.7.3"
   },
   "dependencies": {
+    "@babel/runtime": "^7.16.7",
     "pubsub-js": "^1.9.4"
   }
 }

@@ -6,5 +6,6 @@
         "modules": "commonjs"
       }
     ]
-  ]
+  ],
+  "plugins": [["@babel/transform-runtime"]]
 }
